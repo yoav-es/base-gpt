@@ -1,0 +1,40 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.hypothesis/
+
+# Test and coverage output
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# Generated model artifacts
+checkpoints/
+outputs/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# WikiText corpus files (download locally; do not commit the dataset)
+data/*.tokens
+
+# Local environment and logs
+.env
+.env.*
+!.env.example
+*.log
+
+# Editor and operating-system files
+.idea/
+.DS_Store
+Thumbs.db

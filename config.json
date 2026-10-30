@@ -1,0 +1,17 @@
+{
+  "model": "compare",
+  "optimizer": "adam",
+  "device": "auto",
+  "seed": 1337,
+  "max_new_tokens": 500,
+  "train_file": "wiki.train.tokens",
+  "validation_file": "wiki.valid.tokens",
+  "n_embd": 128,
+  "n_head": 4,
+  "batch_size": 64,
+  "block_size": 256,
+  "learning_rate": 0.0005,
+  "max_iters": 5000,
+  "eval_interval": 100,
+  "eval_iters": 200
+}
