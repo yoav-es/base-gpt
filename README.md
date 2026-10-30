@@ -1,13 +1,14 @@
 # Character-Level Language Models
 
-A small PyTorch project for learning how language models work. It trains
-character-level models on WikiText-103: a bigram model and single-head and
-multi-head causal self-attention models. The default configuration compares
-all three.
+A small PyTorch project for learning how language models work. It is designed
+to train character-level models on any compatible plain-text dataset you
+provide, rather than being tied to one corpus. It includes a bigram model and
+single-head and multi-head causal self-attention models. The default
+configuration compares all three. WikiText-103 is one example dataset.
 
 ## What the program does
 
-1. Reads the locally downloaded WikiText-103 training and validation files.
+1. Reads your training and validation text files.
 2. Lowercases the text and removes characters outside the vocabulary defined
    in `utils.py`.
 3. Builds a character vocabulary from the training split and encodes the
@@ -18,8 +19,8 @@ all three.
    training. Comparison mode also logs a validation-metric summary for all
    three models; single-model mode generates and logs a text sample afterward.
 
-The test split is included in `data/` but is not currently loaded by the
-program.
+The program uses training and validation splits; it does not currently load a
+test split.
 
 ## Program flow
 
@@ -50,7 +51,16 @@ utils.py              Text encoding, batches, loss estimation, and training
 config.json           Model selection and training settings
 requirements.txt      Runtime dependencies
 requirements-dev.txt  Test dependencies
-data/                 WikiText-103 train, validation, and test splits
+data/                 Place your training and validation text files here
+```
+
+## Get the project
+
+Clone the repository and move into the project directory:
+
+```powershell
+git clone https://github.com/yoav-es/base-gpt.git
+cd base-gpt
 ```
 
 ## Requirements and setup
@@ -71,17 +81,29 @@ Run the program from the project directory after activating the environment:
 python main.py
 ```
 
-### Downloading the dataset
+### Preparing text data
 
-The WikiText-103 token files are not included in this repository. Download the
-archive from the [WikiText-103 dataset page](https://developer.ibm.com/exchanges/data/all/wikitext-103/)
-or its [direct archive link](https://dax-assets-dev.s3.us-south.cloud-object-storage.appdomain.cloud/dax-wikitext-103/1.0.0/wikitext-103.tar.gz).
-Extract it and place `wiki.train.tokens` and `wiki.valid.tokens` directly in
-the project's `data/` directory. The program expects these paths:
-`data/wiki.train.tokens` and `data/wiki.valid.tokens`. The test file is not
-currently used. Token files are gitignored because the training split is
-large; each user downloads the data locally. Dataset license details are in
-`data/LICENSE.txt`.
+No particular corpus is required or included in this repository. Choose a
+plain-text source and prepare separate training and validation files. Place
+both files directly in `data/`, then set their filenames in `config.json`
+using `train_file` and `validation_file`. For example, with files named
+`train.txt` and `valid.txt`, set those options to `"train.txt"` and
+`"valid.txt"`.
+
+The training file defines the character vocabulary. Every character that
+remains after preprocessing in the validation file must also appear in the
+training file; otherwise loading the data reports an error. Preprocessing
+lowercases the text and removes characters outside the supported character
+set described below. Keep the source's terms and license requirements in
+mind. Corpus files under `data/` are gitignored, so they stay local and must
+be obtained separately on each computer.
+
+For example, WikiText-103 is one possible source. Its dataset information and
+downloads are available on the
+[dataset page](https://developer.ibm.com/exchanges/data/all/wikitext-103/) and
+[archive link](https://dax-assets-dev.s3.us-south.cloud-object-storage.appdomain.cloud/dax-wikitext-103/1.0.0/wikitext-103.tar.gz).
+If using it, place the training and validation splits in `data/` and use their
+filenames in `config.json`.
 
 ### Running the tests
 
@@ -93,8 +115,8 @@ python -m pytest -q
 ```
 
 Tests use small temporary text files and synthetic token streams; they do not
-train on the full WikiText corpus. The CUDA integration check is skipped when
-CUDA is unavailable.
+train on a full corpus. The CUDA integration check is skipped when CUDA is
+unavailable.
 
 With `device` set to `auto`, the script selects CUDA when available and
 otherwise uses the CPU. You can also explicitly select `cpu` or `cuda`.
@@ -122,13 +144,12 @@ returns `True`; otherwise it logs that it is using the CPU. Set
 instead of silently running on CPU. `main.py` logs the PyTorch version, CUDA
 build, and GPU name when one is selected.
 
-## Data preparation
+## How text is prepared
 
-Place the WikiText-103 `wiki.train.tokens` and `wiki.valid.tokens` files in
-`data/` as described above. The program uses the existing training and
-validation splits; it does not split the training file again. The training
-file is read to build the vocabulary and encode the training data. The
-validation file is encoded using that same vocabulary.
+The program reads the configured training and validation files as existing
+corpus splits; it does not split the training file again. The training file
+is read to build the vocabulary and encode the training data. The validation
+file is encoded using that same vocabulary.
 
 Data is processed a line at a time and stored as one-byte token IDs to avoid
 constructing a large Python list of integers for the training corpus. Batches
@@ -138,10 +159,6 @@ lookups.
 Text preprocessing lowercases characters and preserves letters, whitespace,
 and the punctuation specified by the cleaner in `utils.py`. Other characters,
 including digits, are removed.
-
-The dataset description and its Creative Commons Attribution-ShareAlike 3.0
-license are included in `data/README.txt` and `data/LICENSE.txt`. The upstream
-dataset is [WikiText-103](https://developer.ibm.com/exchanges/data/all/wikitext-103/).
 
 ## Configuration
 
@@ -204,5 +221,6 @@ attention divides that width among `n_head` heads, so `n_embd` must be
 divisible by `n_head`. The bigram model does not use position embeddings or
 attention, so `n_embd` and `n_head` do not affect it.
 
-The repository's `license` file covers the project code. The dataset has its
-own license in `data/LICENSE.txt`.
+The repository's `license` file covers the project code. Any external corpus
+you use may have separate terms or attribution requirements; check the
+license provided by its source.
