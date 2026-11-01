@@ -76,11 +76,14 @@ def test_main_loads_config_and_runs_tiny_project(
         "__file__",
         str(tmp_path / "main.py"),
     )
+    monkeypatch.setattr(main_module.platform, "processor", lambda: "Test CPU")
 
     with caplog.at_level(logging.INFO):
         main_module.main()
 
     assert "Data ready" in caplog.text
+    assert "Using CPU: Test CPU" in caplog.text
+    assert "CUDA available:" in caplog.text
     assert "Training multi_head with adam" in caplog.text
     assert "Training complete" in caplog.text
     assert "Generated text" in caplog.text

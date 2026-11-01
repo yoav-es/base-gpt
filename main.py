@@ -2,6 +2,7 @@
 
 import json
 import logging
+import platform
 from pathlib import Path
 
 import torch
@@ -48,12 +49,16 @@ def main() -> None:
         device,
     )
     logger.info(
-        "PyTorch %s | CUDA build: %s",
+        "PyTorch %s | CUDA build: %s | CUDA available: %s",
         torch.__version__,
         torch.version.cuda or "not available",
+        torch.cuda.is_available(),
     )
     if device.type == "cuda":
-        logger.info("Using NVIDIA GPU: %s", torch.cuda.get_device_name(device))
+        logger.info("Using GPU: %s", torch.cuda.get_device_name(device))
+    else:
+        cpu_name = platform.processor() or platform.machine() or "unknown model"
+        logger.info("Using CPU: %s", cpu_name)
 
     if config["model"] == "compare":
         compare_models(

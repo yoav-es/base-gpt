@@ -90,6 +90,9 @@ using `train_file` and `validation_file`. For example, with files named
 `train.txt` and `valid.txt`, set those options to `"train.txt"` and
 `"valid.txt"`.
 
+Startup checks that both configured files exist in `data/` and reports the
+missing filename(s) before training starts.
+
 The training file defines the character vocabulary. Every character that
 remains after preprocessing in the validation file must also appear in the
 training file; otherwise loading the data reports an error. Preprocessing
@@ -121,7 +124,9 @@ unavailable.
 With `device` set to `auto`, the script selects CUDA when available and
 otherwise uses the CPU. You can also explicitly select `cpu` or `cuda`.
 Training can take a while, especially on CPU. Timestamped progress messages,
-loss values, device selection, and generated text are logged to the terminal.
+loss values, device selection, the CPU or GPU model name, and generated text
+are logged to the terminal. The PyTorch log also reports whether CUDA is
+available in the active environment.
 
 ### Running on an NVIDIA GPU
 
@@ -129,8 +134,10 @@ PyTorch must be installed with a CUDA-enabled build, and the NVIDIA driver
 must support that build. The `torch` entry in `requirements.txt` declares the
 dependency, but does not guarantee that the installed build can use CUDA.
 Use the official [PyTorch installation selector](https://pytorch.org/get-started/locally/)
-to choose the Windows, pip, and CUDA options appropriate for the machine.
-Activate the project's virtual environment before installing.
+to choose the Windows, pip, and CUDA options appropriate for the machine; use
+the selected command to install or replace PyTorch in the project's activated
+virtual environment. Installing the generic project requirements alone may
+not install a build that recognizes the GPU.
 
 Check what the active Python environment can see:
 
@@ -142,7 +149,7 @@ With `"device": "auto"`, training uses CUDA if `torch.cuda.is_available()`
 returns `True`; otherwise it logs that it is using the CPU. Set
 `"device": "cuda"` in `config.json` to require CUDA and stop with an error
 instead of silently running on CPU. `main.py` logs the PyTorch version, CUDA
-build, and GPU name when one is selected.
+build, CUDA availability, and the selected CPU or GPU model.
 
 ## How text is prepared
 

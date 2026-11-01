@@ -85,6 +85,17 @@ def prepare_data(
     in passes so the large corpus does not need to exist as a Python list of
     integer token IDs in memory.
     """
+    missing_files = [
+        path for path in (train_path, val_path) if not path.is_file()
+    ]
+    if missing_files:
+        missing_paths = ", ".join(str(path) for path in missing_files)
+        raise FileNotFoundError(
+            f"Required data file(s) are missing or not regular files: "
+            f"{missing_paths}. Check the configured filenames and data "
+            "directory."
+        )
+
     chars = set()
     for line in _clean_lines(train_path):
         chars.update(line)

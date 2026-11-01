@@ -48,6 +48,21 @@ def test_prepare_data_builds_reversible_character_vocabulary(tmp_path):
     assert {itos[index]: index for index in itos} == stoi
 
 
+@pytest.mark.parametrize("existing_files", [(), ("train.txt",)])
+def test_prepare_data_reports_missing_files(tmp_path, existing_files):
+    train_path = tmp_path / "train.txt"
+    validation_path = tmp_path / "validation.txt"
+    for filename in existing_files:
+        (tmp_path / filename).write_text("abc", encoding="utf-8")
+
+    with pytest.raises(
+        FileNotFoundError, match="Required data file"
+    ) as error:
+        prepare_data(train_path, validation_path)
+    for filename in {"train.txt", "validation.txt"} - set(existing_files):
+        assert filename in str(error.value)
+
+
 @pytest.mark.parametrize(
     ("train_text", "validation_text", "message"),
     [
